@@ -64,17 +64,25 @@ checks. Colab T4 for GPU numbers.
 All code, prose, and figures our own; papers cited; plots generated from our
 benchmark CSVs.
 
+## Timeline
+
+| Week | Huiting | Josh |
+|------|---------|------|
+| Nov 10–16 | LoRA layer; profiler | Repo on hw4_extra base (done); generate loop |
+| Nov 17–23 | LoRA vs. full-FT memory/throughput sweep; profile fwd/bwd | KV cache; multi-adapter batching in Python |
+| Nov 24–28 | Targeted optimization (batched-matmul kernel); re-run sweep | BGMV CUDA kernel; **video Nov 28** |
+| Nov 29–report | Plots + report notebook | Plots + report notebook |
+
 ## Risks
 
-- **Biggest risk:** CUDA kernel iteration only on Colab; Needle transformer slow
-  on CPU. Mitigation: tiny model config; kernels tested against CPU reference
-  first; one Colab session/day for kernel work.
-- **Fallback:** multi-adapter serving in Python (no kernel) + KV cache + the
-  training-side comparison already meets the requirements.
+- **Biggest risk:** we can only test CUDA kernels on Colab, so kernel debugging
+  is slow. We'll keep the model tiny and test every kernel against a CPU
+  reference before touching the GPU.
+- **Fallback:** skip the kernels. KV cache + multi-adapter batching in Python +
+  the LoRA vs. full fine-tuning comparison is still a complete project.
 
 ## Questions for the TA
 
-1. Final report deadline?
-2. Reusing hw4_extra's transformer and PTB loader as the base is OK?
-3. Colab T4 acceptable for GPU numbers?
-4. Is the two-sided scope (training + serving) about right?
+1. Reusing hw4_extra's transformer and PTB loader as the base is OK?
+2. Colab T4 acceptable for GPU numbers?
+3. Is the two-sided scope (training + serving) about right?
