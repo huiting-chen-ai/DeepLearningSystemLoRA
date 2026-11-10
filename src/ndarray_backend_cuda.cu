@@ -92,8 +92,8 @@ __global__ void CompactKernel(const scalar_t* a, scalar_t* out, size_t size, Cud
    *   out: CUDA point to out array
    *   size: size of out array
    *   shape: vector of shapes of a and out arrays (of type CudaVec, for past passing to CUDA kernel)
-   *   strides: vector of strides of a array
-   *   offset: offset of a array
+   *   strides: vector of strides of out array
+   *   offset: offset of out array
    */
   size_t gid = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -162,7 +162,7 @@ void EwiseSetitem(const CudaArray& a, CudaArray* out, std::vector<int32_t> shape
    *   strides: strides of the *out* array (not a, which has compact strides)
    *   offset: offset of the *out* array (not a, which has zero offset, being compact)
    */
-  /// BEGIN SOLUTIONt
+  /// BEGIN SOLUTION
   CudaDims dim = CudaOneDim(a.size);
   EwiseSetitemKernel<<<dim.grid, dim.block>>>(a.ptr, out->ptr, a.size, VecToCuda(shape),
                                          VecToCuda(strides), offset);

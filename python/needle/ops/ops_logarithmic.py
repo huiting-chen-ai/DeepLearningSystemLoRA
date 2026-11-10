@@ -5,7 +5,7 @@ from ..autograd import TensorTuple, TensorTupleOp
 
 from .ops_mathematic import *
 
-import numpy as array_api
+from ..backend_selection import array_api, BACKEND 
 
 class LogSoftmax(TensorOp):
     def compute(self, Z):

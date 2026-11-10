@@ -17,7 +17,7 @@ TENSOR_COUNTER = 0
 import numpy as array_api
 NDArray = numpy.ndarray
 
-from .backend_selection import array_api, NDArray
+from .backend_selection import array_api, NDArray, default_device
 
 class Op:
     """Operator definition."""
@@ -216,7 +216,7 @@ class Tensor(Value):
                     array.numpy(), device=device, dtype=dtype
                 )
         else:
-            device = device if device else cpu()
+            device = device if device else default_device()
             cached_data = Tensor._array_from_numpy(array, device=device, dtype=dtype)
 
         self._init(
@@ -361,9 +361,9 @@ class Tensor(Value):
 
 
 
+
     __radd__ = __add__
     __rmul__ = __mul__
-
 
 def compute_gradient_of_variables(output_tensor, out_grad):
     """Take gradient of output node with respect to each node in node_list.
