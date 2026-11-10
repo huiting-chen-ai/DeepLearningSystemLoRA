@@ -68,9 +68,9 @@ benchmark CSVs.
 
 | Week | Huiting | Josh |
 |------|---------|------|
-| Nov 10–16 | LoRA layer; profiler | Repo on hw4_extra base (done); generate loop |
+| Nov 10–16 | Base model: finish hw4_extra transformer, train on PTB, save checkpoint (both). LoRA layer; profiler | Base model (both). Repo on hw4_extra base (done); generate loop |
 | Nov 17–23 | LoRA vs. full-FT memory/throughput sweep; profile fwd/bwd | KV cache; multi-adapter batching in Python |
-| Nov 24–28 | Targeted optimization (batched-matmul kernel); re-run sweep | BGMV CUDA kernel; **video Nov 28** |
+| Nov 24–28 | Targeted optimization (TBD from profiling); re-run sweep | BGMV CUDA kernel; **video Nov 28** |
 | Nov 29–report | Plots + report notebook | Plots + report notebook |
 
 ## Risks
