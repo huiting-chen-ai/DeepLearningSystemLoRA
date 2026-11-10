@@ -4,13 +4,17 @@ from .init_basic import *
 
 def xavier_uniform(fan_in, fan_out, gain=1.0, **kwargs):
     ### BEGIN YOUR SOLUTION
-    raise NotImplementedError()
+    # Bound keeps the activation variance steady forward and backward
+    bound = gain * math.sqrt(6.0 / (fan_in + fan_out))
+    return rand(fan_in, fan_out, low = -bound, high = bound, **kwargs)
     ### END YOUR SOLUTION
 
 
 def xavier_normal(fan_in, fan_out, gain=1.0, **kwargs):
     ### BEGIN YOUR SOLUTION
-    raise NotImplementedError()
+    # Same idea as xavier_uniform but gaussian, std gives the same variance
+    std = gain * math.sqrt(2.0 / (fan_in + fan_out))
+    return randn(fan_in, fan_out, mean = 0.0, std = std, **kwargs)
     ### END YOUR SOLUTION
 
 
@@ -18,11 +22,17 @@ def xavier_normal(fan_in, fan_out, gain=1.0, **kwargs):
 def kaiming_uniform(fan_in, fan_out, shape=None, nonlinearity="relu", **kwargs):
     assert nonlinearity == "relu", "Only relu supported currently"
     ### BEGIN YOUR SOLUTION
-    raise NotImplementedError()
+    # ReLU kills half the activations so gain = sqrt(2) makes up for it
+    gain = math.sqrt(2.0)
+    bound = gain * math.sqrt(3.0 / fan_in)
+    return rand(fan_in, fan_out, low = -bound, high = bound, **kwargs)
     ### END YOUR SOLUTION
 
 def kaiming_normal(fan_in, fan_out, nonlinearity="relu", **kwargs):
     assert nonlinearity == "relu", "Only relu supported currently"
     ### BEGIN YOUR SOLUTION
-    raise NotImplementedError()
+    # Only fan_in matters, kaiming only cares about the forward pass
+    gain = math.sqrt(2.0)
+    std = gain / math.sqrt(fan_in)
+    return randn(fan_in, fan_out, mean = 0.0, std = std, **kwargs)
     ### END YOUR SOLUTION

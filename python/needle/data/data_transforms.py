@@ -20,7 +20,10 @@ class RandomFlipHorizontal(Transform):
         """
         flip_img = np.random.rand() < self.p
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        # Horizontal flip is just reversing the width axis
+        if flip_img:
+            return img[:, ::-1, :]
+        return img
         ### END YOUR SOLUTION
 
 
@@ -38,5 +41,15 @@ class RandomCrop(Transform):
         """
         shift_x, shift_y = np.random.randint(low=-self.padding, high=self.padding+1, size=2)
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        height, width, channels = img.shape
+        pad = self.padding
+
+        # Drop the image in the middle of a zero canvas padded on every side
+        padded_img = np.zeros((height + 2 * pad, width + 2 * pad, channels), dtype = img.dtype)
+        padded_img[pad:pad + height, pad:pad + width, :] = img
+
+        # Crop back to the original size, shifted off center by the random amount
+        row_start = pad + shift_x
+        col_start = pad + shift_y
+        return padded_img[row_start:row_start + height, col_start:col_start + width, :]
         ### END YOUR SOLUTION

@@ -60,12 +60,27 @@ class DataLoader:
 
     def __iter__(self):
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        # Runs at the start of every epoch so this is where the reshuffle goes
+        # Same layout as the no shuffle case, one index array per batch
+        if self.shuffle:
+            shuffled_indices = np.random.permutation(len(self.dataset))
+            self.ordering = np.array_split(shuffled_indices,
+                                           range(self.batch_size, len(self.dataset), self.batch_size))
+
+        self.next_batch_index = 0
         ### END YOUR SOLUTION
         return self
 
     def __next__(self):
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        if self.next_batch_index >= len(self.ordering):
+            raise StopIteration
+
+        batch_indices = self.ordering[self.next_batch_index]
+        self.next_batch_index += 1
+
+        # Dataset gives a tuple of numpy arrays, wrap each in a Tensor
+        batch_arrays = self.dataset[batch_indices]
+        return tuple(Tensor(array) for array in batch_arrays)
         ### END YOUR SOLUTION
 
