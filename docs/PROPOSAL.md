@@ -72,7 +72,7 @@ on Colab before merging kernel work.
 
 ## 4. Timeline (4 weeks)
 
-Hard dates to confirm with TA: final report / video due date.
+Hard dates: TA check-in **Nov 14**; 90-second video **Nov 28**; final report = Colab notebook, ~2,000 words + code (date TBC). Code is shared via a private link, so the repo must be **private**.
 
 ### Week 1 — Nov 10–16: foundation
 Shared milestone: **a transformer LM trains on PTB on CPU and T4 from the project repo.**
@@ -91,13 +91,13 @@ Shared milestone: **a transformer LM trains on PTB on CPU and T4 from the projec
 | Merged vs. unmerged inference; R4 | Profile fwd/bwd; R2 part 1 (identify bottleneck — expected: the broadcast-and-sum "batched matmul") |
 | Multi-adapter batching in Python (adapter-id gather, shared base matmul) | |
 
-### Week 3 — Nov 24–30 (Thanksgiving week, plan for ~60%)
+### Week 3 — Nov 24–28: kernels, then the video (due Nov 28)
 | Josh | Huiting |
 |------|---------|
 | BGMV CUDA kernel (gathered low-rank matmul), tests, R5 | Batched-matmul CUDA kernel (fwd + bwd), tests; R2 part 2 |
 | Stretch: continuous batching across adapters (requests join/leave between decode steps) | Re-run R1 with the optimization |
 
-### Week 4 — Dec 1–7: results, report, video
+### Week 4 — Nov 29–Dec 7: results + report notebook
 Both: freeze features by Dec 3, generate all plots from `apps/bench/`, write
 report, record video. Buffer for anything that slipped.
 
