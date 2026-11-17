@@ -25,15 +25,32 @@ class SGD(Optimizer):
 
     def step(self):
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        for p in self.params:
+            grad = p.grad.data+self.weight_decay*p.data
+            if p not in self.u:
+                self.u[p] = (1-self.momentum)*grad
+            else:
+                self.u[p] = self.momentum*self.u[p]+(1-self.momentum)*grad
+            p.data = p.data-self.lr*self.u[p]
         ### END YOUR SOLUTION
 
     def clip_grad_norm(self, max_norm=0.25):
         """
         Clips gradient norm of parameters.
+        Note: This does not need to be implemented for HW2 and can be skipped.
         """
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        total_norm = 0
+        for p in self.params:
+            if p.grad is not None:
+                p_norm = np.linalg.norm(p.grad.numpy())
+                total_norm += p_norm**2
+        total_norm = np.sqrt(total_norm)
+        clip_coef = max_norm/(total_norm + 1e-6)
+        if clip_coef < 1:
+            for p in self.params:
+                if p.grad is not None:
+                    p.grad = p.grad*clip_coef
         ### END YOUR SOLUTION
 
 
@@ -60,5 +77,18 @@ class Adam(Optimizer):
 
     def step(self):
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        self.t += 1
+        for p in self.params:
+            grad = p.grad.data+self.weight_decay*p.data
+            if p not in self.m:
+                self.m[p] = (1-self.beta1)*grad
+            else:
+                self.m[p] = self.beta1*self.m[p]+(1-self.beta1)*grad
+            if p not in self.v:
+                self.v[p] = (1-self.beta2)*grad**2
+            else:
+                self.v[p] = self.beta2*self.v[p]+(1-self.beta2)*grad**2
+            correct_m = self.m[p]/(1-self.beta1**self.t)
+            correct_v = self.v[p]/(1-self.beta2**self.t)
+            p.data = p.data-self.lr*correct_m/(correct_v**0.5+self.eps)
         ### END YOUR SOLUTION

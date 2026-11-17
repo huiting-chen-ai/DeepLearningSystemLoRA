@@ -258,7 +258,7 @@ class NDArray:
             new_shape (tuple): new shape of the array
 
         Returns:
-            NDArray : reshaped array; this will point to the
+            NDArray : reshaped array; this will point to thep
         """
 
         ### BEGIN YOUR SOLUTION
@@ -331,8 +331,7 @@ class NDArray:
           else:
             new_strides.append(0)
         return self.make(new_shape, tuple(new_strides), self._device, self._handle, self._offset)
-        
-        ### END YOUR SOLUTION
+        ### END YOUR SOLUTION]
 
     ### Get and set elements
 
@@ -342,7 +341,7 @@ class NDArray:
         if start is None:
             start = 0
         if start < 0:
-            start = self.shape[dim] + start
+            start = self.shape[dim]
         if stop is None:
             stop = self.shape[dim]
         if stop < 0:
@@ -389,10 +388,6 @@ class NDArray:
         # handle singleton as tuple, everything as slices
         if not isinstance(idxs, tuple):
             idxs = (idxs,)
-        idxs = tuple(
-            s + self.shape[i] if isinstance(s, int) and s < 0 else s
-            for i, s in enumerate(idxs)
-        )
         slices = tuple(
             [
                 self.process_slice(s, i) if isinstance(s, slice) else slice(s, s + 1, 1)
@@ -618,7 +613,34 @@ class NDArray:
         self.device.reduce_max(view.compact()._handle, out._handle, view.shape[-1])
         return out
 
+    def flip(self, axes: tuple[int, ...]) -> "NDArray":
+        """
+        Flip this ndarray along the specified axes.
+        Note: compact() before returning.
+        """
+        ### BEGIN YOUR SOLUTION
+        new_strides = (-s if i in axes else s for i, s in enumerate(self._strides))
+        new_offset = self._offset
+        for i, s in enumerate(self._strides):
+            if i in axes:
+                new_offset += s*(self._shape[i]-1)
+        out = NDArray.make(self._shape, new_strides, self._device, self._handle, new_offset).compact()
+        return out
+        ### END YOUR SOLUTION
 
+    def pad(self, axes: tuple[tuple[int, int], ...]) -> "NDArray":
+        """
+        Pad this ndarray by zeros by the specified amount in `axes`,
+        which lists for _all_ axes the left and right padding amount, e.g.,
+        axes = ( (0, 0), (1, 1), (0, 0)) pads the middle axis with a 0 on the left and right side.
+        """
+        ### BEGIN YOUR SOLUTION
+        new_shape = tuple(s+axes[i][0]+axes[i][1] for i, s in enumerate(self._shape))
+        out = self.device.full(new_shape, fill_value=0)
+        slices = tuple(slice(axes[i][0], axes[i][0]+s) for i, s in enumerate(self._shape))
+        out[slices] = self
+        return out
+        ### END YOUR SOLUTION
 
 def array(a: Any, dtype: str = "float32", device: BackendDevice | None = None) -> NDArray:
     """Convenience methods to match numpy a bit more closely."""
@@ -665,3 +687,5 @@ def sum(a: NDArray, axis: int | tuple[int] | list[int] | None = None, keepdims: 
     return a.sum(axis=axis, keepdims=keepdims)
 
 
+def flip(a: NDArray, axes: tuple[int, ...]) -> NDArray:
+    return a.flip(axes)

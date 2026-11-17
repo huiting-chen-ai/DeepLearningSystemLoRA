@@ -173,7 +173,6 @@ void ScalarAdd(const AlignedArray& a, scalar_t val, AlignedArray* out) {
  * functions (however you want to do so, as long as the functions match the proper)
  * signatures above.
  */
-
 #define EWISE_TWO_OP(name, op) \
 void name(const AlignedArray& a, const AlignedArray& b, AlignedArray* out) { \
   for (size_t i = 0; i < a.size; i++) { \

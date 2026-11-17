@@ -1,7 +1,7 @@
 """Core data structures."""
 import needle
-from .backend_numpy import Device, cpu, all_devices
-from typing import List, Optional, NamedTuple, Tuple, Union
+from .backend_numpy import Device, all_devices
+from typing import List, Optional, NamedTuple, Tuple, Union, Dict
 from collections import namedtuple
 import numpy
 
@@ -17,7 +17,7 @@ TENSOR_COUNTER = 0
 import numpy as array_api
 NDArray = numpy.ndarray
 
-from .backend_selection import array_api, NDArray
+from .backend_selection import array_api, NDArray, default_device, cpu
 
 class Op:
     """Operator definition."""
@@ -216,7 +216,7 @@ class Tensor(Value):
                     array.numpy(), device=device, dtype=dtype
                 )
         else:
-            device = device if device else cpu()
+            device = device if device else default_device()
             cached_data = Tensor._array_from_numpy(array, device=device, dtype=dtype)
 
         self._init(
@@ -305,7 +305,7 @@ class Tensor(Value):
     def numpy(self):
         data = self.realize_cached_data()
         if array_api is numpy:
-            return data
+            return numpy.array(data)
         return data.numpy()
 
     def __add__(self, other):
@@ -361,9 +361,9 @@ class Tensor(Value):
 
 
 
+
     __radd__ = __add__
     __rmul__ = __mul__
-
 
 def compute_gradient_of_variables(output_tensor, out_grad):
     """Take gradient of output node with respect to each node in node_list.
@@ -381,7 +381,23 @@ def compute_gradient_of_variables(output_tensor, out_grad):
     reverse_topo_order = list(reversed(find_topo_sort([output_tensor])))
 
     ### BEGIN YOUR SOLUTION
-    raise NotImplementedError()
+    for node in reverse_topo_order:
+      grad = sum_node_list(node_to_output_grads_list[node])
+      node.grad = grad
+      if node.is_leaf():
+        continue
+      new_grads = node.op.gradient(grad, node)
+      for i, n in enumerate(node.inputs):
+        if node_to_output_grads_list.get(n):
+          if isinstance(new_grads, tuple):
+            node_to_output_grads_list[n].append(new_grads[i])
+          else:
+            node_to_output_grads_list[n].append(new_grads)
+        else:
+          if isinstance(new_grads, tuple):
+            node_to_output_grads_list[n] = [new_grads[i]]
+          else:
+            node_to_output_grads_list[n] = [new_grads]
     ### END YOUR SOLUTION
 
 
@@ -394,14 +410,24 @@ def find_topo_sort(node_list: List[Value]) -> List[Value]:
     sort.
     """
     ### BEGIN YOUR SOLUTION
-    raise NotImplementedError()
+    visited = set()
+    topo_order = []
+    for n in node_list:
+      topo_sort_dfs(n, visited, topo_order)
+    return topo_order
     ### END YOUR SOLUTION
 
 
 def topo_sort_dfs(node, visited, topo_order):
     """Post-order DFS"""
     ### BEGIN YOUR SOLUTION
-    raise NotImplementedError()
+    if node in visited:
+      return
+    visited.add(node)
+    if not node.is_leaf():
+      for n in node.inputs:
+        topo_sort_dfs(n, visited, topo_order)
+    topo_order.append(node)
     ### END YOUR SOLUTION
 
 
