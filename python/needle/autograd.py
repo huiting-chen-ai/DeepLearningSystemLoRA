@@ -134,6 +134,7 @@ class Value:
         self.num_outputs = num_outputs
         self.cached_data = cached_data
         self.requires_grad = requires_grad
+        self.grad = None
 
     @classmethod
     def make_const(cls, data, *, requires_grad=False):
@@ -192,7 +193,7 @@ class TensorTuple(Value):
 
 
 class Tensor(Value):
-    grad: "Tensor"
+    grad: Optional["Tensor"]
 
     def __init__(
         self,
