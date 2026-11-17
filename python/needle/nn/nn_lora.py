@@ -22,7 +22,7 @@ class LoRALinear(Module):
         super().__init__()
         if not isinstance(base_layer, Linear):
             raise TypeError("base_layer must be a needle.nn.Linear")
-        if not isinstance(rank, int) or isinstance(rank, bool) or rank <= 0:
+        if not isinstance(rank, int) or rank <= 0:
             raise ValueError("rank must be a positive integer")
 
         self.base_layer = base_layer
