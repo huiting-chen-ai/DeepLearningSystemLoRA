@@ -134,6 +134,7 @@ class Value:
         self.num_outputs = num_outputs
         self.cached_data = cached_data
         self.requires_grad = requires_grad
+        self.grad = None
 
     @classmethod
     def make_const(cls, data, *, requires_grad=False):
@@ -289,6 +290,7 @@ class Tensor(Value):
         return data.device
 
     def backward(self, out_grad=None):
+        """Compute gradients; freezing a tensor does not clear an existing gradient."""
         out_grad = (
             out_grad
             if out_grad
@@ -368,7 +370,7 @@ class Tensor(Value):
 def compute_gradient_of_variables(output_tensor, out_grad):
     """Take gradient of output node with respect to each node in node_list.
 
-    Store the computed result in the grad field of each Variable.
+    Store the computed result in the grad field of each trainable Variable.
     """
     # a map from node to a list of gradient contributions from each output node
     node_to_output_grads_list: Dict[Tensor, List[Tensor]] = {}
@@ -382,22 +384,16 @@ def compute_gradient_of_variables(output_tensor, out_grad):
 
     ### BEGIN YOUR SOLUTION
     for node in reverse_topo_order:
-      grad = sum_node_list(node_to_output_grads_list[node])
-      node.grad = grad
-      if node.is_leaf():
-        continue
-      new_grads = node.op.gradient(grad, node)
-      for i, n in enumerate(node.inputs):
-        if node_to_output_grads_list.get(n):
-          if isinstance(new_grads, tuple):
-            node_to_output_grads_list[n].append(new_grads[i])
-          else:
-            node_to_output_grads_list[n].append(new_grads)
-        else:
-          if isinstance(new_grads, tuple):
-            node_to_output_grads_list[n] = [new_grads[i]]
-          else:
-            node_to_output_grads_list[n] = [new_grads]
+        if not node.requires_grad or node not in node_to_output_grads_list:
+            continue
+        grad = sum_node_list(node_to_output_grads_list[node])
+        node.grad = grad
+        if node.is_leaf():
+            continue
+        new_grads = node.op.gradient_as_tuple(grad, node)
+        for n, input_grad in zip(node.inputs, new_grads):
+            if n.requires_grad:
+                node_to_output_grads_list.setdefault(n, []).append(input_grad)
     ### END YOUR SOLUTION
 
 

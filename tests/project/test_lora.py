@@ -97,6 +97,6 @@ def test_apply_lora_freezes_base_and_leaves_adapters_trainable():
     assert all(not parameter.requires_grad for parameter in second.parameters())
 
     trainable_elements = sum(
-        parameter.size for parameter in model.parameters() if parameter.requires_grad
+        np.prod(parameter.shape) for parameter in model.parameters() if parameter.requires_grad
     )
-    assert trainable_elements == 2 * (4 * 2 + 2 * 6)
+    assert trainable_elements == 4 * 2 + 2 * 6

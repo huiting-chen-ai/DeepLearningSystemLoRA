@@ -26,6 +26,8 @@ class SGD(Optimizer):
     def step(self):
         ### BEGIN YOUR SOLUTION
         for p in self.params:
+            if not p.requires_grad or p.grad is None:
+                continue
             grad = p.grad.data+self.weight_decay*p.data
             if p not in self.u:
                 self.u[p] = (1-self.momentum)*grad
@@ -42,14 +44,14 @@ class SGD(Optimizer):
         ### BEGIN YOUR SOLUTION
         total_norm = 0
         for p in self.params:
-            if p.grad is not None:
+            if p.requires_grad and p.grad is not None:
                 p_norm = np.linalg.norm(p.grad.numpy())
                 total_norm += p_norm**2
         total_norm = np.sqrt(total_norm)
         clip_coef = max_norm/(total_norm + 1e-6)
         if clip_coef < 1:
             for p in self.params:
-                if p.grad is not None:
+                if p.requires_grad and p.grad is not None:
                     p.grad = p.grad*clip_coef
         ### END YOUR SOLUTION
 
@@ -79,6 +81,8 @@ class Adam(Optimizer):
         ### BEGIN YOUR SOLUTION
         self.t += 1
         for p in self.params:
+            if not p.requires_grad or p.grad is None:
+                continue
             grad = p.grad.data+self.weight_decay*p.data
             if p not in self.m:
                 self.m[p] = (1-self.beta1)*grad
