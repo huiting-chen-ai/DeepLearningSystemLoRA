@@ -278,6 +278,10 @@ class Tensor(Value):
         return self.realize_cached_data().shape
 
     @property
+    def size(self):
+        return self.realize_cached_data().size
+
+    @property
     def dtype(self):
         return self.realize_cached_data().dtype
 
