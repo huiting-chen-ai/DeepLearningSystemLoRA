@@ -382,6 +382,8 @@ def compute_gradient_of_variables(output_tensor, out_grad):
 
     ### BEGIN YOUR SOLUTION
     for node in reverse_topo_order:
+      if not node.requires_grad or node not in node_to_output_grads_list:
+        continue
       grad = sum_node_list(node_to_output_grads_list[node])
       node.grad = grad
       if node.is_leaf():
