@@ -5,6 +5,7 @@ from needle.autograd import Tensor
 from needle import ops
 import needle.init as init
 import numpy as np
+import math
 
 
 class Parameter(Tensor):
@@ -208,8 +209,8 @@ class LayerNorm1d(Module):
         self.dim = dim
         self.eps = eps
         ### BEGIN YOUR SOLUTION
-        self.weight = Parameter(init.ones(dim, requires_grad=True))
-        self.bias = Parameter(init.zeros(dim, requires_grad=True))
+        self.weight = Parameter(init.ones(dim, requires_grad=True, device=device, dtype=dtype))
+        self.bias = Parameter(init.zeros(dim, requires_grad=True, device=device, dtype=dtype))
         ### END YOUR SOLUTION
 
     def forward(self, x: Tensor) -> Tensor:
@@ -238,10 +239,16 @@ class Dropout(Module):
 
     def forward(self, x: Tensor) -> Tensor:
         ### BEGIN YOUR SOLUTION
-        if self.training:
-            mask = init.randb(*x.shape, p=(1-self.p))
-            x = ops.divide_scalar(ops.multiply(x, mask), 1-self.p)
-        return x
+        if not self.training or self.p == 0:
+            return x
+
+        mask = init.randb(
+            *x.shape,
+            p=1 - self.p,
+            device=x.device,
+            dtype=x.dtype,
+        )
+        return x * mask / (1 - self.p)
         ### END YOUR SOLUTION
 
 

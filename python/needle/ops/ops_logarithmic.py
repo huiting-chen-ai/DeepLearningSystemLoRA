@@ -76,3 +76,4 @@ class LogSumExp(TensorOp):
 
 def logsumexp(a: Tensor, axes: Optional[tuple] = None) -> Tensor:
     return LogSumExp(axes=axes)(a)
+
