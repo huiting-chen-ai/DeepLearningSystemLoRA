@@ -8,4 +8,5 @@ from .init import ones, zeros, zeros_like, ones_like
 from . import data
 from . import nn
 from . import optim
+from . import profiler
 from .backend_selection import *
